@@ -33,7 +33,7 @@ return view.extend({
 		expect: { result: false }
 	}),
 
-	getInitStatus: function() {
+	getInitStatus() {
 		return this.callInitStatus(this.appName).then(res => {
 			if(res) {
 				return res[this.appName].enabled;
@@ -46,7 +46,7 @@ return view.extend({
 		});
 	},
 
-	handleServiceAction: function(action) {
+	handleServiceAction(action) {
 		return this.callInitAction(this.appName, action).then(success => {
 			if(!success) {
 				throw _('Command failed');
@@ -58,14 +58,14 @@ return view.extend({
 		});
 	},
 
-	serviceRestart: function(ev) {
+	serviceRestart(ev) {
 		poll.stop();
 		return this.handleServiceAction('restart').then(() => {
 			poll.start();
 		});
 	},
 
-	freqFormat : function(freq) {
+	freqFormat(freq) {
 		if(!freq) {
 			return '-';
 		};
@@ -75,7 +75,7 @@ return view.extend({
 			(freq / 1e3) + ' ' + _('MHz');
 	},
 
-	updateCpuPerfData: function() {
+	updateCpuPerfData() {
 		this.callCpuPerf().then((data) => {
 			if(data.cpus) {
 				for(let i of Object.values(data.cpus)) {
@@ -115,7 +115,7 @@ return view.extend({
 	CBIBlockPerf: form.Value.extend({
 		__name__ : 'CBI.BlockPerf',
 
-		__init__ : function(map, section, ctx, perfData) {
+		__init__(map, section, ctx, perfData) {
 			this.map      = map;
 			this.section  = section;
 			this.ctx      = ctx;
@@ -124,7 +124,7 @@ return view.extend({
 			this.rmempty  = true;
 		},
 
-		renderWidget: function(section_id, option_index, cfgvalue) {
+		renderWidget(section_id, option_index, cfgvalue) {
 			let cpuTableTitles = [
 				_('CPU'),
 				_('Current frequency'),
@@ -136,10 +136,10 @@ return view.extend({
 			let cpuTable = E('table', { 'class': 'table' },
 				E('tr', { 'class': 'tr table-titles' }, [
 					E('th', { 'class': 'th left' }, cpuTableTitles[0]),
-					E('th', { 'class': 'th center' }, cpuTableTitles[1]),
-					E('th', { 'class': 'th center' }, cpuTableTitles[2]),
-					E('th', { 'class': 'th center' }, cpuTableTitles[3]),
-					E('th', { 'class': 'th center' }, cpuTableTitles[4]),
+					E('th', { 'class': 'th left' }, cpuTableTitles[1]),
+					E('th', { 'class': 'th left' }, cpuTableTitles[2]),
+					E('th', { 'class': 'th left' }, cpuTableTitles[3]),
+					E('th', { 'class': 'th left' }, cpuTableTitles[4]),
 				])
 			);
 
@@ -157,7 +157,7 @@ return view.extend({
 								}, _('CPU') + ' ' + i.number),
 								E('td', {
 									'id': 'cpu' + i.number + 'curFreq',
-									'class': 'td center',
+									'class': 'td left',
 									'data-title': cpuTableTitles[1],
 								}, (i.sCurFreq) ?
 										this.ctx.freqFormat(i.sCurFreq)
@@ -166,7 +166,7 @@ return view.extend({
 								),
 								E('td', {
 									'id': 'cpu' + i.number + 'minFreq',
-									'class': 'td center',
+									'class': 'td left',
 									'data-title': cpuTableTitles[2],
 								}, (i.sMinFreq) ?
 										this.ctx.freqFormat(i.sMinFreq)
@@ -175,7 +175,7 @@ return view.extend({
 								),
 								E('td', {
 									'id': 'cpu' + i.number + 'maxFreq',
-									'class': 'td center',
+									'class': 'td left',
 									'data-title': cpuTableTitles[3],
 								}, (i.sMaxFreq) ?
 										this.ctx.freqFormat(i.sMaxFreq)
@@ -184,7 +184,7 @@ return view.extend({
 								),
 								E('td', {
 									'id': 'cpu' + i.number + 'governor',
-									'class': 'td center',
+									'class': 'td left',
 									'data-title': cpuTableTitles[4],
 								}, i.governor || '-'),
 							])
@@ -261,7 +261,7 @@ return view.extend({
 	CBIBlockInitButton: form.Value.extend({
 		__name__ : 'CBI.BlockInitButton',
 
-		__init__ : function(map, section, ctx) {
+		__init__(map, section, ctx) {
 			this.map      = map;
 			this.section  = section;
 			this.ctx      = ctx;
@@ -269,7 +269,7 @@ return view.extend({
 			this.rmempty  = true;
 		},
 
-		renderWidget: function(section_id, option_index, cfgvalue) {
+		renderWidget(section_id, option_index, cfgvalue) {
 			this.ctx.initButton = E('button', {
 				'class': (!this.ctx.initStatus) ? btnStyleDisabled : btnStyleEnabled,
 				'click': ui.createHandlerFn(this, () => {
@@ -307,7 +307,7 @@ return view.extend({
 		},
 	}),
 
-	freqValidate: function(section_id, value, slave_elem, max=false) {
+	freqValidate(section_id, value, slave_elem, max=false) {
 		let slaveValue = slave_elem.formvalue(section_id);
 		if(value === '' || slaveValue === '') {
 			return true;
@@ -320,7 +320,7 @@ return view.extend({
 		return `${_('Frequency value must not be')} ${max ? _('lower') : _('higher')} ${_('than the')} "${slave_elem.title}"!`;
 	},
 
-	load: function() {
+	load() {
 		return Promise.all([
 			this.getInitStatus(),
 			this.callCpuPerf(),
@@ -330,7 +330,7 @@ return view.extend({
 		});
 	},
 
-	render: function(data) {
+	render(data) {
 		if(!data) {
 			return;
 		};
@@ -563,7 +563,7 @@ return view.extend({
 		return mapPromise;
 	},
 
-	handleSaveApply: function(ev, mode) {
+	handleSaveApply(ev, mode) {
 		return this.handleSave(ev).then(() => {
 			ui.changes.apply(mode == '0');
 			window.setTimeout(() => this.serviceRestart(), 3000);
